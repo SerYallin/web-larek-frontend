@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="in"
+                 name="Web Larek"
+                 start-page="index.md">
+
+    <toc-element topic="index.md"/>
+    <toc-element topic="analize.md"/>
+    <toc-element topic="classes.md"/>
+    <toc-element topic="types.md"/>
+    <toc-element topic="process.md"/>
+    <toc-element topic="details.md"/>
+    <toc-element topic="setup.md"/>
+</instance-profile>
