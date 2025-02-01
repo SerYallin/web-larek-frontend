@@ -39,6 +39,17 @@ type TCategory = {
 }
 
 /**
+ * Order status sets.
+ */
+enum OrderStatus {
+	CREATED = 'created',
+	PROCESSING = 'processing',
+	COMPLETED = 'completed',
+	ERROR = 'error',
+	CANCELED = 'canceled',
+}
+
+/**
  * Base collection interface.
  */
 interface ICollection<Type> {
@@ -68,10 +79,10 @@ interface ICollection<Type> {
 	 *
 	 * @param {string} id
 	 *   Item id string.
-	 * @returns {Type}
+	 * @returns {Type | undefined}ICollection
 	 *   The item data.
 	 */
-	getItem(id: string): Type;
+	getItem(id: string): Type | undefined;
 
 	/**
 	 * Remove item from the basket.
@@ -85,7 +96,7 @@ interface ICollection<Type> {
 /**
  * Basket collection.
  */
-interface BasketCollection<Type> extends ICollection<Type> {
+interface IBasketCollection<Type> extends ICollection<Type> {
 
 	/**
 	 * The total amount of items in the basket.
@@ -98,13 +109,15 @@ interface BasketCollection<Type> extends ICollection<Type> {
 	totalPrice: number;
 }
 
-interface IOrder extends ICollection<TProduct> {
+interface IOrder {
 
 	_payment: string;
 	_address: string;
 	_email: string;
 	_phone: string;
-	_status: string;
+	_status: OrderStatus;
+	_errors: string[];
+	_basket: IBasketCollection<TProduct>;
 
 	/**
 	 * Total price of items in the basket.
@@ -112,9 +125,44 @@ interface IOrder extends ICollection<TProduct> {
 	total: number;
 
 	/**
+	 * Update order according to the data.
+	 *
+	 * @param {object} data
+	 *   Order data.
+	 */
+	update(data: object): void;
+
+	/**
+	 * Set new order status.
+	 *
+	 * @param {OrderStatus} status
+	 *   New order status.
+	 */
+	setStatus(status: OrderStatus): void
+
+	/**
 	 * Get order status.
+	 *
+	 * @returns {string}
+	 *   Order status.
 	 */
 	getStatus(): string;
+
+	/**
+	 * Add new order error.
+	 *
+	 * @param {string} error
+	 *   Order error message.
+	 */
+	addError(error: string): void
+
+	/**
+	 * Get order errors.
+	 *
+	 * @returns {string[]}
+	 *   Order errors.
+	 */
+	getErrors(): string[];
 }
 
 interface AppInterface {
@@ -132,7 +180,7 @@ interface AppInterface {
 	/**
 	 * Application basket items.
 	 */
-	basket: BasketCollection<TProduct>;
+	basket: IBasketCollection<TProduct>;
 
 	/**
 	 * Initial application function.
