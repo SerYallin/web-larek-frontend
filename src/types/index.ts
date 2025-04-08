@@ -1,11 +1,19 @@
+import { Order } from '../components/Order';
+
+type TCollectionItem = {
+	id: string,
+	title: string
+}
+
 /**
  * Product item type.
  */
-type TProduct = {
+type TProduct = TCollectionItem & {
+
 	/**
-	 * Product name.
+	 * Product id.
 	 */
-	name: string,
+	id: string,
 
 	/**
 	 * Product price.
@@ -25,28 +33,23 @@ type TProduct = {
 	/**
 	 * Product category id.
 	 */
-	category: number,
+	category: string,
 }
 
 /**
  * Product category type.
  */
-type TCategory = {
-	/**
-	 * Category name.
-	 */
-	name: string,
-}
+type TCategory = TCollectionItem & {
+	slug: string
+};
 
 /**
  * Order status sets.
  */
 enum OrderStatus {
 	CREATED = 'created',
-	PROCESSING = 'processing',
 	COMPLETED = 'completed',
 	ERROR = 'error',
-	CANCELED = 'canceled',
 }
 
 /**
@@ -54,7 +57,7 @@ enum OrderStatus {
  */
 interface ICollection<Type> {
 	/**
-	 * The items in the collection, where the string is item id and the value is the item.
+	 * The items in the collection, where the number is item id and the value is the item.
 	 */
 	_items: Map<string, Type>;
 
@@ -93,109 +96,48 @@ interface ICollection<Type> {
 	removeItem(id: string): void;
 }
 
-/**
- * Basket collection.
- */
-interface IBasketCollection<Type> extends ICollection<Type> {
-
-	/**
-	 * The total amount of items in the basket.
-	 */
-	count: number;
-
-	/**
-	 * Total price of items in the basket.
-	 */
-	totalPrice: number;
-}
-
 interface IOrder {
-
-	_payment: string;
-	_address: string;
-	_email: string;
-	_phone: string;
-	_status: OrderStatus;
-	_errors: string[];
-	_basket: IBasketCollection<TProduct>;
-
-	/**
-	 * Total price of items in the basket.
-	 */
-	total: number;
-
-	/**
-	 * Update order according to the data.
-	 *
-	 * @param {object} data
-	 *   Order data.
-	 */
-	update(data: object): void;
-
-	/**
-	 * Set new order status.
-	 *
-	 * @param {OrderStatus} status
-	 *   New order status.
-	 */
-	setStatus(status: OrderStatus): void
-
-	/**
-	 * Get order status.
-	 *
-	 * @returns {string}
-	 *   Order status.
-	 */
-	getStatus(): string;
-
-	/**
-	 * Add new order error.
-	 *
-	 * @param {string} error
-	 *   Order error message.
-	 */
-	addError(error: string): void
-
-	/**
-	 * Get order errors.
-	 *
-	 * @returns {string[]}
-	 *   Order errors.
-	 */
-	getErrors(): string[];
+	payment: string,
+	email: string,
+	phone: string,
+	address: string,
+	total: number,
+	items: string[]
 }
 
 interface AppInterface {
-
-	/**
-	 * Application product list.
-	 */
-	products: ICollection<TProduct>;
-
-	/**
-	 * Application categories.
-	 */
-	categories: ICollection<TCategory>;
-
-	/**
-	 * Application basket items.
-	 */
-	basket: IBasketCollection<TProduct>;
-
-	/**
-	 * Initial application function.
-	 */
-	init(): void;
+	products: ICollection<TProduct>
+	categories: ICollection<TCategory>
+	basket: string[];
+	activeProduct: string | null
+	order: Order
 }
 
 interface IView {
 
 	/**
-	 * Render view.
-	 *
-	 * @returns {string}
+	 * Return rendered element.
 	 */
-	render(): string
+	render(): HTMLElement;
+
+	/**
+	 * Init view's elements.
+	 */
+	initElements():void;
+
+	/**
+	 * Init view's events.
+	 */
+	initEvents():void;
 }
 
-
+export {
+	TCollectionItem,
+	TProduct,
+	TCategory,
+	OrderStatus,
+	ICollection,
+	IOrder,
+	AppInterface,
+	IView
+}
