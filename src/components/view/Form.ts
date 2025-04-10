@@ -35,7 +35,7 @@ export class Form<Type> extends View<IFormState> {
 	}
 
 	protected onInputChange(field: keyof Type, value: string) {
-		this.events.emit(`${(this.container as HTMLFormElement).name}.${String(field)}:change`, {
+		this.events.emit(`${(this.container as HTMLFormElement).name}:field-change`, {
 			field,
 			value,
 		});

@@ -5,7 +5,7 @@ import { ShopApi } from './components/ShopApi';
 import { EventEmitter } from './components/base/events';
 import { AppState, knownCategories } from './components/AppState';
 import { Page } from './components/view/Page';
-import { OrderStatus, TProduct } from './types';
+import { EventsNames, OrderStatus, TProduct } from './types';
 import {
 	Product,
 	ProductBasket,
@@ -34,6 +34,8 @@ const order = new OrderForm('#order', events);
 const contacts = new ContactForm('#contacts', events);
 const success = new Success('#success', events);
 
+busket.buttonActive = false;
+
 // Чтобы мониторить все события, для отладки
 events.onAll(({ eventName, data }) => {
 	console.log(eventName, data);
@@ -44,22 +46,22 @@ state.setCategories(knownCategories);
 
 page.counter = 0;
 
-events.on('products:changed', () => {
+events.on(EventsNames.PRODUCTS_CHANGED, () => {
 	page.products = state.products.getItems().map((item: TProduct) => {
 		const product = new Product('#card-catalog', events);
 		return product.render(item);
 	});
 });
 
-events.on('product:category-set', (product:Product) => {
+events.on(EventsNames.PRODUCT_CATEGORY_SET, (product:Product) => {
 	product.categoryClass = state.categories.getItem(product.category).slug;
 });
 
-events.on('product:preview', (product:Product) => {
+events.on(EventsNames.PRODUCT_PREVIEW, (product:Product) => {
 	state.setPreview(product);
 });
 
-events.on('preview:changed', (product:Product) => {
+events.on(EventsNames.PRODUCT_PREVIEW_CHANGED, (product:Product) => {
 
 	const data = state.products.getItem(product.id);
 
@@ -70,25 +72,25 @@ events.on('preview:changed', (product:Product) => {
 	});
 });
 
-events.on('bucket:open', () => {
+events.on(EventsNames.BASKET_OPEN, () => {
 	modal.render({
 		content: busket.render(),
 	});
 });
-events.on('basket:add', (product:Product) => {
+events.on(EventsNames.BASKET_ADD, (product:Product) => {
 	if (!state.basket.includes(product.id)) {
 		state.basket.push(product.id);
-		events.emit('basket:changed');
+		events.emit(EventsNames.BASKET_CHANGED);
 		modal.close();
 	}
 });
 
-events.on('basket:delete', (data: ProductBasket<TProductBasket>) => {
+events.on(EventsNames.BASKET_DELETE, (data: ProductBasket<TProductBasket>) => {
 	state.basket.splice(data.index, 1);
-	events.emit('basket:changed');
+	events.emit(EventsNames.BASKET_CHANGED);
 });
 
-events.on('basket:changed', () => {
+events.on(EventsNames.BASKET_CHANGED, () => {
 	page.counter = state.totalCount;
 	busket.items = state.basket.map((itemId: string, index: number) => {
 		const product: TProduct = state.products.getItem(itemId);
@@ -100,19 +102,23 @@ events.on('basket:changed', () => {
 			index: index + 1
 		})});
 	busket.total = state.totalPrice;
+	busket.buttonActive = state.basket.length > 0
 });
 
 // Блокируем прокрутку страницы если открыта модалка
-events.on('modal:open', () => {
+events.on(EventsNames.MODAL_OPEN, () => {
 	page.locked = true;
 });
 
 // Разлокируем прокрутку страницы если открыта модалка
-events.on('modal:close', () => {
+events.on(EventsNames.MODAL_CLOSE, () => {
 	page.locked = false;
 });
 
-events.on('order:open', () => {
+events.on(EventsNames.ORDER_OPEN, () => {
+	if (state.basket.length === 0) {
+		return;
+	}
 	modal.render({
 		content: order.render({
 			payment: '',
@@ -125,7 +131,7 @@ events.on('order:open', () => {
 	state.order.setStatus(OrderStatus.CREATED);
 });
 
-events.on('order:change', (data: Order) => {
+events.on(EventsNames.ORDER_CHANGE, (data: Order) => {
 	order.render({
 		payment: data.payment,
 		address: data.address,
@@ -134,7 +140,7 @@ events.on('order:change', (data: Order) => {
 	});
 });
 
-events.on('contacts:change', (data: Order) => {
+events.on(EventsNames.CONTACTS_CHANGE, (data: Order) => {
 	contacts.render({
 		email: data.email,
 		phone: data.phone,
@@ -143,15 +149,15 @@ events.on('contacts:change', (data: Order) => {
 	});
 });
 
-events.on(/^order\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+events.on(EventsNames.ORDER_FIELD_CHANGE, (data: { field: keyof IOrderForm, value: string }) => {
 	state.setOrderField(data.field, data.value);
 });
 
-events.on(/^contacts\..*:change/, (data: { field: keyof IOrderForm, value: string }) => {
+events.on(EventsNames.CONTACTS_FIELD_CHANGE, (data: { field: keyof IOrderForm, value: string }) => {
 	state.setContactsField(data.field, data.value);
 });
 
-events.on('order:submit', () => {
+events.on(EventsNames.ORDER_SUBMIT, () => {
 	modal.render({
 		content: contacts.render({
 			email: '',
@@ -162,7 +168,7 @@ events.on('order:submit', () => {
 	});
 });
 
-events.on('contacts:submit', () => {
+events.on(EventsNames.CONTACTS_SUBMIT, () => {
 	shopApi.sendOrder(state.order).then((result: ISuccess) => {
 		modal.render({
 			content: success.render(result)
@@ -176,13 +182,11 @@ events.on('contacts:submit', () => {
 	});
 });
 
-events.on('success:close', () => {
+events.on(EventsNames.SUCCESS_CLOSE, () => {
 	modal.close();
 })
 
 shopApi.getProducts().then((products) => {
 	state.setProducts(products)
 })
-	.catch((error) => {
-		console.error(error);
-	});
+	.catch(console.error);

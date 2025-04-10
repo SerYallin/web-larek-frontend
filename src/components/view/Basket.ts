@@ -1,6 +1,7 @@
 import { View } from '../base/View';
 import { IEvents } from '../base/events';
 import { createElement } from '../../utils/utils';
+import { EventsNames } from '../../types';
 
 interface IBasket {
 	items: HTMLElement[];
@@ -9,7 +10,7 @@ interface IBasket {
 export class Basket extends View<IBasket> {
 	protected _list: HTMLElement;
 	protected _total: HTMLElement;
-	protected _button: HTMLElement;
+	protected _button: HTMLButtonElement;
 
 	constructor(container: string | HTMLElement, protected events: IEvents) {
 		super(container);
@@ -18,12 +19,12 @@ export class Basket extends View<IBasket> {
 	initElements() {
 		this._list = this.getElement('.basket__list');
 		this._total = this.getElement('.basket__price');
-		this._button = this.getElement('.basket__button');
+		this._button = this.getElement('.basket__button') as HTMLButtonElement;
 	}
 
 	initEvents() {
 		this._button.addEventListener('click', () => {
-			this.events.emit('order:open');
+			this.events.emit(EventsNames.ORDER_OPEN);
 		});
 	}
 
@@ -42,4 +43,9 @@ export class Basket extends View<IBasket> {
 	set total(total: number) {
 		this.setText(this._total, total ? total.toString() + ' синапсов' : '');
 	}
+
+	set buttonActive(active: boolean) {
+		this._button.disabled = !active;
+	}
+
 }

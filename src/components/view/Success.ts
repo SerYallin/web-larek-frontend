@@ -1,5 +1,6 @@
 import { View } from '../base/View';
 import { IEvents } from '../base/events';
+import { EventsNames } from '../../types';
 
 export interface ISuccess{
 	total: number;
@@ -23,7 +24,7 @@ export class Success extends View<ISuccess> {
 
 	initEvents() {
 		this._button.addEventListener('click', () => {
-			this.events.emit('success:close');
+			this.events.emit(EventsNames.SUCCESS_CLOSE);
 		});
 	}
 }

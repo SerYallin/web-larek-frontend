@@ -1,5 +1,6 @@
 import { View } from '../base/View';
 import { IEvents } from '../base/events';
+import { EventsNames } from '../../types';
 
 interface IPage {
 	counter: number;
@@ -52,7 +53,7 @@ export class Page extends View<IPage> {
 
 	initEvents() {
 		this._bucket.addEventListener('click', () => {
-			this.events.emit('bucket:open');
+			this.events.emit(EventsNames.BASKET_OPEN);
 		});
 	}
 
@@ -65,10 +66,6 @@ export class Page extends View<IPage> {
 	}
 
 	set locked(value: boolean) {
-		if (value) {
-			this._wrapper.classList.add('page__wrapper_locked');
-		} else {
-			this._wrapper.classList.remove('page__wrapper_locked');
-		}
+		this._wrapper.classList.toggle('page__wrapper_locked', value);
 	}
 }

@@ -52,6 +52,27 @@ enum OrderStatus {
 	ERROR = 'error',
 }
 
+enum EventsNames {
+	PRODUCTS_CHANGED = 'products:changed',
+	PRODUCT_CATEGORY_SET = 'product:category-set',
+	PRODUCT_PREVIEW = 'product:preview',
+	PRODUCT_PREVIEW_CHANGED = 'preview:changed',
+	BASKET_OPEN = 'basket:open',
+	BASKET_ADD = 'basket:add',
+	BASKET_DELETE = 'basket:delete',
+	BASKET_CHANGED = 'basket:changed',
+	MODAL_OPEN = 'modal:open',
+	MODAL_CLOSE = 'modal:close',
+	ORDER_OPEN = 'order:open',
+	ORDER_CHANGE = 'order:change',
+	CONTACTS_CHANGE = 'contacts:change',
+	ORDER_FIELD_CHANGE = 'order:field-change',
+	CONTACTS_FIELD_CHANGE = 'contacts:field-change',
+	ORDER_SUBMIT = 'order:submit',
+	CONTACTS_SUBMIT = 'contacts:submit',
+	SUCCESS_CLOSE = 'success:close',
+}
+
 /**
  * Base collection interface.
  */
@@ -132,6 +153,7 @@ interface IView {
 }
 
 export {
+	EventsNames,
 	TCollectionItem,
 	TProduct,
 	TCategory,

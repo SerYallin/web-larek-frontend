@@ -1,4 +1,4 @@
-import { AppInterface, ICollection, TCategory, TProduct } from '../types/index';
+import { AppInterface, EventsNames, ICollection, TCategory, TProduct } from '../types/index';
 import { Model } from './base/Model';
 import { Collection } from './base/Collection';
 import { Product } from './view/Product';
@@ -58,7 +58,7 @@ export class AppState extends Model<AppInterface>{
 
 	setProducts(products: TProduct[]){
 		this.products = new Collection<TProduct>(products);
-		this.emitChanges('products:changed', this.products.getItems());
+		this.emitChanges(EventsNames.PRODUCTS_CHANGED, this.products.getItems());
 	}
 
 	setCategories(categories: TCategory[]){
@@ -67,7 +67,7 @@ export class AppState extends Model<AppInterface>{
 
 	setPreview(product: Product) {
 		this.activeProduct = product.id;
-		this.emitChanges('preview:changed', product);
+		this.emitChanges(EventsNames.PRODUCT_PREVIEW_CHANGED, product);
 	}
 
 	setOrderField(field: keyof IOrderForm, value: string) {
@@ -89,7 +89,7 @@ export class AppState extends Model<AppInterface>{
 		if (!this.order.address) {
 			this.order.addError('Необходимо указать адрес доставки');
 		}
-		this.events.emit('order:change', this.order);
+		this.events.emit(EventsNames.ORDER_CHANGE, this.order);
 	}
 
 	validateContactStep() {
@@ -108,7 +108,7 @@ export class AppState extends Model<AppInterface>{
 		else if (!expressionPhone.test(this.order.phone)) {
 			this.order.addError('Неверный формат телефона, например +7 (000) 000-00-00');
 		}
-		this.events.emit('contacts:change', this.order);
+		this.events.emit(EventsNames.CONTACTS_CHANGE, this.order);
 	}
 
 	clearOrder() {
@@ -124,7 +124,7 @@ export class AppState extends Model<AppInterface>{
 
 	clearBasket() {
 		this.basket = [];
-		this.emitChanges('basket:changed');
+		this.emitChanges(EventsNames.BASKET_CHANGED);
 	}
 
 	get totalPrice(): number {

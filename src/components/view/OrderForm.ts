@@ -29,12 +29,7 @@ export class OrderForm extends Form<IOrderForm> {
 
 	set payment(value: string) {
 		this._payments.forEach((element: HTMLElement) => {
-			if (element.getAttribute('name') === value) {
-				element.classList.add('button_alt-active');
-			}
-			else {
-				element.classList.remove('button_alt-active');
-			}
+			element.classList.toggle('button_alt-active', element.getAttribute('name') === value);
 		});
 	}
 
