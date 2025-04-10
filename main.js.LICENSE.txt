@@ -1,6 +1,10 @@
+/*! ../../types */
+
 /*! ../../utils/utils */
 
 /*! ../base/View */
+
+/*! ../types/index */
 
 /*! ./Form */
 
